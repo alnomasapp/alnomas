@@ -1,0 +1,129 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://scripts/ui/virtual_joystick.gd" id="2_joystick"]
+[ext_resource type="Script" path="res://scripts/ui/touch_look_area.gd" id="3_lookarea"]
+[ext_resource type="Script" path="res://scripts/ui/jump_button.gd" id="4_jumpbtn"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat_1"]
+sky_top_color = Color(0.204, 0.298, 0.45, 1)
+sky_horizon_color = Color(0.9, 0.55, 0.32, 1)
+sky_curve = 0.15
+ground_bottom_color = Color(0.35, 0.24, 0.16, 1)
+ground_horizon_color = Color(0.85, 0.5, 0.3, 1)
+sun_angle_max = 30.0
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("SkyMat_1")
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+tonemap_mode = 3
+fog_enabled = true
+fog_light_color = Color(0.85, 0.6, 0.4, 1)
+fog_density = 0.004
+
+[sub_resource type="PlaneMesh" id="GroundMesh"]
+size = Vector2(200, 200)
+subdivide_width = 20
+subdivide_depth = 20
+
+[sub_resource type="StandardMaterial3D" id="SandMat"]
+albedo_color = Color(0.78, 0.65, 0.42, 1)
+roughness = 0.95
+
+[sub_resource type="WorldBoundaryShape3D" id="GroundShape"]
+
+[sub_resource type="CapsuleMesh" id="PlayerMesh"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="PlayerMat"]
+albedo_color = Color(0.9, 0.9, 0.85, 1)
+
+[sub_resource type="CapsuleShape3D" id="PlayerShape"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="SphereShape3D" id="SpringShape"]
+radius = 0.2
+
+[node name="DesertTest" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+position = Vector3(0, 4, 0)
+rotation_degrees = Vector3(-35, -40, 0)
+light_color = Color(1, 0.78, 0.55, 1)
+light_energy = 1.25
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("GroundMesh")
+surface_material_override/0 = SubResource("SandMat")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("GroundShape")
+
+[node name="Player" type="CharacterBody3D" parent="." groups=["player"]]
+script = ExtResource("1_player")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("PlayerMesh")
+surface_material_override/0 = SubResource("PlayerMat")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("PlayerShape")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="Player"]
+position = Vector3(0.4, 1.55, 0)
+rotation_degrees = Vector3(-8, 0, 0)
+shape = SubResource("SpringShape")
+spring_length = 3.4
+margin = 0.25
+
+[node name="Camera3D" type="Camera3D" parent="Player/SpringArm3D"]
+fov = 70.0
+
+[node name="TouchUI" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="LookArea" type="Control" parent="TouchUI"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("3_lookarea")
+joystick_path = NodePath("../Joystick")
+jump_button_path = NodePath("../JumpButton")
+
+[node name="Joystick" type="Control" parent="TouchUI"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = -198.0
+offset_right = 188.0
+offset_bottom = -38.0
+mouse_filter = 2
+script = ExtResource("2_joystick")
+
+[node name="JumpButton" type="Control" parent="TouchUI"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -140.0
+offset_top = -160.0
+offset_right = -40.0
+offset_bottom = -60.0
+mouse_filter = 2
+script = ExtResource("4_jumpbtn")
+
+[connection signal="moved" from="TouchUI/Joystick" to="Player" method="set_joystick_input"]
+[connection signal="pressed_jump" from="TouchUI/JumpButton" to="Player" method="request_jump"]

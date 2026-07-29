@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="alnomas"
+run/main_scene="res://scenes/match/desert_test.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+InputBootstrap="*res://scripts/core/input_bootstrap.gd"
 
 [display]
 
