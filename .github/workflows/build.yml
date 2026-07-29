@@ -19,6 +19,12 @@ jobs:
         with:
           lfs: true
 
+      - name: Setup Java (required by Android export)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
       - name: Move export templates to expected path
         run: |
           mkdir -v -p ~/.local/share/godot/export_templates
