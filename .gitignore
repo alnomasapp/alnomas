@@ -1,0 +1,16 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+export_presets.cfg
+
+# macOS
+.DS_Store
+._*
+
+# Raw/source assets — kept on SSD + cloud backup, never in Git
+/raw_assets/
+
+# Editor/OS
+*.tmp
+*.log
+.claude/
